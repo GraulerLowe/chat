@@ -1,8 +1,9 @@
 [package]
-name = "chat"
+name = "Chat"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
 hyper = { version = "0.14", features = ["full", "server"] }
+reqwest = "0.11.12"
 tokio = { version = "1", features = ["full"] }

@@ -1,0 +1,1 @@
+/home/grauler/Documentos/Ciencias\ de\ la\ Computacion/3\ semestre/Modelado\ Y\ Programacion/chat/Chat/target/debug/Chat: /home/grauler/Documentos/Ciencias\ de\ la\ Computacion/3\ semestre/Modelado\ Y\ Programacion/chat/Chat/src/main.rs

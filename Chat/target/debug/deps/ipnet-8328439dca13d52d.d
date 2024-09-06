@@ -1,0 +1,11 @@
+/home/grauler/Documentos/Ciencias de la Computacion/3 semestre/Modelado Y Programacion/chat/Chat/target/debug/deps/libipnet-8328439dca13d52d.rmeta: /home/grauler/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ipnet-2.9.0/src/lib.rs /home/grauler/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ipnet-2.9.0/src/ipext.rs /home/grauler/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ipnet-2.9.0/src/ipnet.rs /home/grauler/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ipnet-2.9.0/src/parser.rs /home/grauler/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ipnet-2.9.0/src/mask.rs
+
+/home/grauler/Documentos/Ciencias de la Computacion/3 semestre/Modelado Y Programacion/chat/Chat/target/debug/deps/libipnet-8328439dca13d52d.rlib: /home/grauler/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ipnet-2.9.0/src/lib.rs /home/grauler/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ipnet-2.9.0/src/ipext.rs /home/grauler/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ipnet-2.9.0/src/ipnet.rs /home/grauler/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ipnet-2.9.0/src/parser.rs /home/grauler/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ipnet-2.9.0/src/mask.rs
+
+/home/grauler/Documentos/Ciencias de la Computacion/3 semestre/Modelado Y Programacion/chat/Chat/target/debug/deps/ipnet-8328439dca13d52d.d: /home/grauler/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ipnet-2.9.0/src/lib.rs /home/grauler/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ipnet-2.9.0/src/ipext.rs /home/grauler/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ipnet-2.9.0/src/ipnet.rs /home/grauler/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ipnet-2.9.0/src/parser.rs /home/grauler/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ipnet-2.9.0/src/mask.rs
+
+/home/grauler/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ipnet-2.9.0/src/lib.rs:
+/home/grauler/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ipnet-2.9.0/src/ipext.rs:
+/home/grauler/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ipnet-2.9.0/src/ipnet.rs:
+/home/grauler/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ipnet-2.9.0/src/parser.rs:
+/home/grauler/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ipnet-2.9.0/src/mask.rs:
