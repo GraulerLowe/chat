@@ -1,11 +1,28 @@
 use tokio::net::TcpStream;
 use tokio::io::{self, AsyncReadExt, AsyncWriteExt};
 use std::io::{stdin, stdout, Write};
+use std::net::SocketAddr;
 
 #[tokio::main]
 async fn main() -> io::Result<()> {
-    let mut stream = TcpStream::connect("127.0.0.1:8080").await?;
-    println!("Conectado al servidor en 127.0.0.1:8080");
+    let server_address = loop {
+        let mut input = String::new();
+        print!("Introduce la dirección IP y puerto del servidor (formato: IP:PUERTO): ");
+        stdout().flush().unwrap();
+        stdin().read_line(&mut input).unwrap();
+        let input = input.trim();
+
+        // Verificar si la entrada es una dirección válida
+        if input.parse::<SocketAddr>().is_ok() {
+            break input.to_string();
+        } else {
+            println!("Formato incorrecto. Por favor, intenta de nuevo.");
+        }
+    };
+
+    // Clonar la dirección del servidor antes de moverla
+    let mut stream = TcpStream::connect(server_address.clone()).await?;
+    println!("Conectado al servidor en {}", server_address);
 
     loop {
         // Leer entrada del usuario
@@ -19,7 +36,7 @@ async fn main() -> io::Result<()> {
         println!("Mensaje enviado: {:?}", input.trim());
 
         // Leer respuesta del servidor
-        let mut buf = [0; 1024];
+        let mut buf = vec![0; 1024];
         let n = stream.read(&mut buf).await?;
         println!("Respuesta del servidor: {:?}", String::from_utf8_lossy(&buf[..n]));
     }
