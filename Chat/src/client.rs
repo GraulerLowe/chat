@@ -1,6 +1,17 @@
 use std::io::{self, stdin, stdout, Write, Read};
 use std::net::{TcpStream, SocketAddr};
 use std::thread;
+use serde_json;
+use serde::{Serialize, Deserialize};
+
+
+#[derive(Serialize, Deserialize)]
+struct ClientMessage {
+    id: u32,
+    name: String,
+    message: String,
+}
+
 
 fn main() -> io::Result<()> {
     let server_address = loop {
@@ -37,13 +48,23 @@ fn main() -> io::Result<()> {
         }
     });
 
+    let client_id = 1; // Puedes generar un ID único para cada cliente
+    let client_name = "Cliente1".to_string(); // Nombre del cliente
+
     loop {
         let mut input = String::new();
         print!("Escribe un mensaje: ");
         stdout().flush().unwrap();
         stdin().read_line(&mut input).unwrap();
 
-        stream.write_all(input.as_bytes())?;
-        println!("Mensaje enviado: {}", input.trim());
+        let client_message = ClientMessage {
+            id: client_id,
+            name: client_name.clone(),
+            message: input.trim().to_string(),
+        };
+
+        let json_message = serde_json::to_string(&client_message).unwrap();
+        stream.write_all(json_message.as_bytes())?;
+        println!("Mensaje enviado: {}", json_message);
     }
 }

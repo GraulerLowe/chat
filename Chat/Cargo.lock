@@ -8,6 +8,8 @@ version = "0.1.0"
 dependencies = [
  "hyper",
  "reqwest",
+ "serde",
+ "serde_json",
  "tokio",
  "tokio-util 0.6.10",
 ]

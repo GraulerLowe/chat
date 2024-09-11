@@ -20,17 +20,17 @@ fn handle_client(mut stream: TcpStream, tx: mpsc::Sender<String>) {
 }
 
 fn main() -> std::io::Result<()> {
-    let listener = TcpListener::bind("127.0.0.1:8080")?;
+    let listener = TcpListener::bind("10.141.216.240:8080")?;
     println!("El servidor está escuchando en el puerto 8080...");
 
-    let (tx, rx) = mpsc::channel::<String>(); // Especificar el tipo aquí
+    let (tx, rx) = mpsc::channel::<String>();
     let clients: Arc<Mutex<Vec<TcpStream>>> = Arc::new(Mutex::new(Vec::new()));
 
     let clients_clone = Arc::clone(&clients);
     thread::spawn(move || {
         for message in rx {
             let clients = clients_clone.lock().unwrap();
-            for mut client in clients.iter() { // Declarar client como mutable
+            for mut client in clients.iter() {
                 client.write_all(message.as_bytes()).unwrap();
             }
         }
