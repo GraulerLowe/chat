@@ -1,9 +1,7 @@
-use std::io::{self, stdin, stdout, Write, Read};
+use std::io::{self, Write, Read};
 use std::net::{TcpStream, SocketAddr};
 use std::thread;
-use serde_json;
 use serde::{Serialize, Deserialize};
-
 
 #[derive(Serialize, Deserialize)]
 struct ClientMessage {
@@ -12,13 +10,12 @@ struct ClientMessage {
     message: String,
 }
 
-
 fn main() -> io::Result<()> {
     let server_address = loop {
         let mut input = String::new();
         print!("Introduce la dirección IP y puerto del servidor (formato: IP:PUERTO): ");
-        stdout().flush().unwrap();
-        stdin().read_line(&mut input).unwrap();
+        io::stdout().flush().unwrap();
+        io::stdin().read_line(&mut input).unwrap();
         let input = input.trim();
 
         if input.parse::<SocketAddr>().is_ok() {
@@ -48,14 +45,36 @@ fn main() -> io::Result<()> {
         }
     });
 
-    let client_id = 1; // Puedes generar un ID único para cada cliente
-    let client_name = "Cliente1".to_string(); // Nombre del cliente
+    let client_id = loop {
+        let mut input = String::new();
+        print!("Introduce tu ID de cliente: ");
+        io::stdout().flush().unwrap();
+        io::stdin().read_line(&mut input).unwrap();
+        if let Ok(id) = input.trim().parse::<u32>() {
+            break id;
+        } else {
+            println!("ID inválido. Por favor, intenta de nuevo.");
+        }
+    };
+
+    let client_name = loop {
+        let mut input = String::new();
+        print!("Introduce tu nombre de cliente: ");
+        io::stdout().flush().unwrap();
+        io::stdin().read_line(&mut input).unwrap();
+        let input = input.trim().to_string();
+        if !input.is_empty() {
+            break input;
+        } else {
+            println!("Nombre inválido. Por favor, intenta de nuevo.");
+        }
+    };
 
     loop {
         let mut input = String::new();
-        print!("Escribe un mensaje: ");
-        stdout().flush().unwrap();
-        stdin().read_line(&mut input).unwrap();
+        println!("Escribe un mensaje: ");
+        io::stdout().flush().unwrap();
+        io::stdin().read_line(&mut input).unwrap();
 
         let client_message = ClientMessage {
             id: client_id,

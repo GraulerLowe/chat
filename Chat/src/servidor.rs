@@ -4,7 +4,7 @@ use std::sync::{Arc, Mutex, mpsc};
 use std::thread;
 
 fn handle_client(mut stream: TcpStream, tx: mpsc::Sender<String>) {
-    let mut buffer = [0; 1024];
+    let mut buffer = [0; 512];
     loop {
         match stream.read(&mut buffer) {
             Ok(n) => {
@@ -20,8 +20,8 @@ fn handle_client(mut stream: TcpStream, tx: mpsc::Sender<String>) {
 }
 
 fn main() -> std::io::Result<()> {
-    let listener = TcpListener::bind("10.141.216.240:8080")?;
-    println!("El servidor está escuchando en el puerto 8080...");
+    let listener = TcpListener::bind("192.168.100.8:8080")?;
+    println!("El servidor se inicia en el puerto 8080...");
 
     let (tx, rx) = mpsc::channel::<String>();
     let clients: Arc<Mutex<Vec<TcpStream>>> = Arc::new(Mutex::new(Vec::new()));
