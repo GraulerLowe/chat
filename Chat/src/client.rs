@@ -5,7 +5,6 @@ use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize)]
 struct ClientMessage {
-    id: u32,
     name: String,
     message: String,
 }
@@ -45,18 +44,6 @@ fn main() -> io::Result<()> {
         }
     });
 
-    let client_id = loop {
-        let mut input = String::new();
-        print!("Introduce tu ID de cliente: ");
-        io::stdout().flush().unwrap();
-        io::stdin().read_line(&mut input).unwrap();
-        if let Ok(id) = input.trim().parse::<u32>() {
-            break id;
-        } else {
-            println!("ID inválido. Por favor, intenta de nuevo.");
-        }
-    };
-
     let client_name = loop {
         let mut input = String::new();
         print!("Introduce tu nombre de cliente: ");
@@ -69,6 +56,8 @@ fn main() -> io::Result<()> {
             println!("Nombre inválido. Por favor, intenta de nuevo.");
         }
     };
+    
+    stream.write_all(client_name.as_bytes())?;
 
     loop {
         let mut input = String::new();
@@ -77,7 +66,6 @@ fn main() -> io::Result<()> {
         io::stdin().read_line(&mut input).unwrap();
 
         let client_message = ClientMessage {
-            id: client_id,
             name: client_name.clone(),
             message: input.trim().to_string(),
         };
