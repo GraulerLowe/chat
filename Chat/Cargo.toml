@@ -6,10 +6,9 @@ edition = "2021"
 [dependencies]
 hyper = { version = "0.14",features = ["full", "server"] }
 reqwest = "0.11.12"
-tokio = { version = "1", features = ["full"] }
-tokio-util = "0.6"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
+uuid = { version = "1", features = ["v4"] }
 
 [[bin]]
 name = "servidor"
@@ -18,3 +17,7 @@ path = "src/servidor.rs"
 [[bin]]
 name = "client"
 path = "src/client.rs"
+
+[[bin]]
+name = "json"
+path = "src/json.rs"

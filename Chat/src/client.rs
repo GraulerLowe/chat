@@ -1,13 +1,9 @@
 use std::io::{self, Write, Read};
 use std::net::{TcpStream, SocketAddr};
 use std::thread;
-use serde::{Serialize, Deserialize};
-
-#[derive(Serialize, Deserialize)]
-struct ClientMessage {
-    name: String,
-    message: String,
-}
+use json::{ClientMessage, to_json, from_json};
+use uuid::Uuid;  // Para generar un identificador único
+mod json;
 
 fn main() -> io::Result<()> {
     let server_address = loop {
@@ -28,12 +24,25 @@ fn main() -> io::Result<()> {
     println!("Conectado al servidor en {}", server_address);
 
     let mut stream_clone = stream.try_clone()?;
+    let client_id = Uuid::new_v4();  // Generar un identificador único para el cliente
+    println!("ID de cliente: {}", client_id);
+
+    // Hilo para escuchar mensajes del servidor
     thread::spawn(move || {
         loop {
             let mut buf = vec![0; 512];
             match stream_clone.read(&mut buf) {
                 Ok(n) if n > 0 => {
-                    println!("Mensaje del servidor: {}", String::from_utf8_lossy(&buf[..n]));
+                    let received = String::from_utf8_lossy(&buf[..n]);
+                    match from_json(&received) {
+                        Ok(message) => {
+                            // Solo imprimir si el mensaje proviene de otro cliente
+                            if message.id != client_id.to_string() {
+                                println!("{}: {}", message.name, message.message);
+                            }
+                        }
+                        Err(_) => println!("Mensaje recibido no es JSON válido"),
+                    }
                 }
                 Ok(_) => break,
                 Err(e) => {
@@ -56,7 +65,8 @@ fn main() -> io::Result<()> {
             println!("Nombre inválido. Por favor, intenta de nuevo.");
         }
     };
-    
+
+    // Enviar el nombre del cliente al servidor
     stream.write_all(client_name.as_bytes())?;
 
     loop {
@@ -66,12 +76,18 @@ fn main() -> io::Result<()> {
         io::stdin().read_line(&mut input).unwrap();
 
         let client_message = ClientMessage {
+            id: client_id.to_string(),  // Incluir el ID del cliente en el mensaje
             name: client_name.clone(),
             message: input.trim().to_string(),
         };
 
-        let json_message = serde_json::to_string(&client_message).unwrap();
-        stream.write_all(json_message.as_bytes())?;
-        println!("Mensaje enviado: {}", json_message);
+        // Enviar el mensaje al servidor
+        match to_json(&client_message) {
+            Ok(json_message) => {
+                stream.write_all(json_message.as_bytes())?;
+                println!("Mensaje enviado");
+            }
+            Err(e) => eprintln!("Error al convertir el mensaje a JSON: {}", e),
+        }
     }
 }

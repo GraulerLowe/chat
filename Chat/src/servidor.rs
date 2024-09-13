@@ -1,10 +1,11 @@
-
 use std::io::{Read, Write};
 use std::net::{TcpListener, TcpStream};
 use std::sync::{Arc, Mutex, mpsc};
 use std::thread;
+use json::{ClientMessage, to_json, from_json};
+mod json;
 
-fn handle_client(mut stream: TcpStream, tx: mpsc::Sender<(usize, String)>, id: usize) {
+fn handle_client(mut stream: TcpStream, tx: mpsc::Sender<ClientMessage>) {
     let mut buffer = [0; 512];
     loop {
         match stream.read(&mut buffer) {
@@ -12,8 +13,11 @@ fn handle_client(mut stream: TcpStream, tx: mpsc::Sender<(usize, String)>, id: u
                 if n == 0 {
                     break;
                 }
-                let message = String::from_utf8_lossy(&buffer[..n]).to_string();
-                tx.send((id, message)).unwrap();
+                let message_str = String::from_utf8_lossy(&buffer[..n]).to_string();
+                match from_json(&message_str) {
+                    Ok(message) => tx.send(message).unwrap(),
+                    Err(_) => eprintln!("Mensaje JSON inválido recibido: {}", message_str),
+                }
             }
             Err(_) => break,
         }
@@ -21,20 +25,24 @@ fn handle_client(mut stream: TcpStream, tx: mpsc::Sender<(usize, String)>, id: u
 }
 
 fn main() -> std::io::Result<()> {
-    let listener = TcpListener::bind("192.168.100.8:8080")?;
+    let listener = TcpListener::bind("127.0.0.1:8080")?;
     println!("El servidor se inicia en el puerto 8080...");
 
-    let (tx, rx) = mpsc::channel::<(usize, String)>();
-    let clients: Arc<Mutex<Vec<(usize, TcpStream)>>> = Arc::new(Mutex::new(Vec::new()));
-    let client_id = Arc::new(Mutex::new(0));
+    let (tx, rx) = mpsc::channel::<ClientMessage>();
+    let clients: Arc<Mutex<Vec<TcpStream>>> = Arc::new(Mutex::new(Vec::new()));
 
     let clients_clone = Arc::clone(&clients);
     thread::spawn(move || {
-        for (id, message) in rx {
+        for message in rx {
             let mut clients = clients_clone.lock().unwrap();
-            for (client_id, client) in clients.iter_mut() {
-                if *client_id != id {
-                    client.write_all(message.as_bytes()).unwrap();
+            for client in clients.iter_mut() {
+                match to_json(&message) {
+                    Ok(json_message) => {
+                        if let Err(e) = client.write_all(json_message.as_bytes()) {
+                            eprintln!("Error al enviar el mensaje a un cliente: {}", e);
+                        }
+                    }
+                    Err(e) => eprintln!("Error al convertir el mensaje a JSON: {}", e),
                 }
             }
         }
@@ -43,16 +51,13 @@ fn main() -> std::io::Result<()> {
     for stream in listener.incoming() {
         match stream {
             Ok(stream) => {
-                let mut id = client_id.lock().unwrap();
-                *id += 1;
-                let current_id = *id;
-                println!("Nueva conexión: {:?}, ID: {}", stream.peer_addr(), current_id);
+                println!("Nueva conexión: {:?}", stream.peer_addr());
 
                 let clients = Arc::clone(&clients);
-                clients.lock().unwrap().push((current_id, stream.try_clone().unwrap()));
+                clients.lock().unwrap().push(stream.try_clone().unwrap());
                 let tx = tx.clone();
                 thread::spawn(move || {
-                    handle_client(stream, tx, current_id);
+                    handle_client(stream, tx);
                 });
             }
             Err(e) => {
@@ -62,4 +67,3 @@ fn main() -> std::io::Result<()> {
     }
     Ok(())
 }
-
