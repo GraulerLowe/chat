@@ -1,8 +1,8 @@
-use std::io::{self, Write, Read};
-use std::net::{TcpStream, SocketAddr};
+use json::{from_json, to_json, ClientMessage, ClientIdentify};
+use std::io::{self, Read, Write};
+use std::net::{SocketAddr, TcpStream};
 use std::thread;
-use json::{ClientMessage, to_json, from_json};
-use uuid::Uuid;  // Para generar un identificador único
+use uuid::Uuid; // Para generar un identificador único
 mod json;
 
 fn main() -> io::Result<()> {
@@ -24,7 +24,7 @@ fn main() -> io::Result<()> {
     println!("Conectado al servidor en {}", server_address);
 
     let mut stream_clone = stream.try_clone()?;
-    let client_id = Uuid::new_v4();  // Generar un identificador único para el cliente
+    let client_id = Uuid::new_v4(); // Generar un identificador único para el cliente
     println!("ID de cliente: {}", client_id);
 
     // Hilo para escuchar mensajes del servidor
@@ -91,7 +91,7 @@ fn main() -> io::Result<()> {
         io::stdin().read_line(&mut input).unwrap();
 
         let client_message = ClientMessage {
-            id: client_id.to_string(),  // Incluir el ID del cliente en el mensaje
+            id: client_id.to_string(), // Incluir el ID del cliente en el mensaje
             name: client_name.clone(),
             message: input.trim().to_string(),
         };
