@@ -53,22 +53,37 @@ fn main() -> io::Result<()> {
         }
     });
 
+    // Solicitar y validar nombre de cliente con el servidor
     let client_name = loop {
         let mut input = String::new();
         print!("Introduce tu nombre de cliente: ");
         io::stdout().flush().unwrap();
         io::stdin().read_line(&mut input).unwrap();
         let input = input.trim().to_string();
-        if !input.is_empty() {
-            break input;
-        } else {
-            println!("Nombre inválido. Por favor, intenta de nuevo.");
+
+        // Enviar el nombre del cliente al servidor
+        stream.write_all(input.as_bytes())?;
+
+        // Esperar la respuesta del servidor
+        let mut buffer = [0; 512];
+        match stream.read(&mut buffer) {
+            Ok(n) => {
+                let response = String::from_utf8_lossy(&buffer[..n]);
+                if response.contains("Nombre en uso") {
+                    println!("{}", response); // Mostrar mensaje de error y solicitar un nuevo nombre
+                } else {
+                    println!("Nombre aceptado por el servidor.");
+                    break input; // Nombre aceptado, salir del loop
+                }
+            }
+            Err(e) => {
+                eprintln!("Error al leer la respuesta del servidor: {}", e);
+                return Err(e); // Manejo de error si la conexión falla
+            }
         }
     };
 
-    // Enviar el nombre del cliente al servidor
-    stream.write_all(client_name.as_bytes())?;
-
+    // Bucle principal de envío de mensajes
     loop {
         let mut input = String::new();
         println!("Escribe un mensaje: ");
