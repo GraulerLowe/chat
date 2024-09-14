@@ -1,4 +1,4 @@
-use json::{from_json, to_json, ClientMessage, ClientIdentify};
+use json::{from_json, to_json, ClientMessage};
 use std::io::{self, Read, Write};
 use std::net::{SocketAddr, TcpStream};
 use std::thread;

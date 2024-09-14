@@ -8,11 +8,6 @@ pub struct ClientMessage {
     pub message: String, // Mensaje enviado
 }
 
-pub struct ClientIdentify {
-    pub id: String,     // Identificador único del cliente
-    pub name: String,   // Nombre del cliente
-}
-
 pub fn to_json(message: &ClientMessage) -> Result<String, serde_json::Error> {
     serde_json::to_string(message)
 }

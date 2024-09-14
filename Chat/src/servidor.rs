@@ -14,7 +14,7 @@ fn handle_client(mut stream: TcpStream, tx: mpsc::Sender<ClientMessage>, clients
         match stream.read(&mut buffer) {
             Ok(n) => {
                 if n == 0 {
-                    return; // El cliente se desconectó antes de enviar un nombre
+                    return;
                 }
 
                 let name = String::from_utf8_lossy(&buffer[..n]).trim().to_string();
