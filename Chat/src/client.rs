@@ -1,8 +1,8 @@
-use std::io::{self, Write, Read};
-use std::net::{TcpStream, SocketAddr};
+use json::{from_json, to_json, ClientMessage, ClientIdentify};
+use std::io::{self, Read, Write};
+use std::net::{SocketAddr, TcpStream};
 use std::thread;
-use json::{ClientMessage, to_json, from_json};
-use uuid::Uuid;  // Para generar un identificador único
+use uuid::Uuid; // Para generar un identificador único
 mod json;
 
 fn main() -> io::Result<()> {
@@ -24,7 +24,7 @@ fn main() -> io::Result<()> {
     println!("Conectado al servidor en {}", server_address);
 
     let mut stream_clone = stream.try_clone()?;
-    let client_id = Uuid::new_v4();  // Generar un identificador único para el cliente
+    let client_id = Uuid::new_v4(); // Generar un identificador único para el cliente
     println!("ID de cliente: {}", client_id);
 
     // Hilo para escuchar mensajes del servidor
@@ -53,22 +53,37 @@ fn main() -> io::Result<()> {
         }
     });
 
+    // Solicitar y validar nombre de cliente con el servidor
     let client_name = loop {
         let mut input = String::new();
         print!("Introduce tu nombre de cliente: ");
         io::stdout().flush().unwrap();
         io::stdin().read_line(&mut input).unwrap();
         let input = input.trim().to_string();
-        if !input.is_empty() {
-            break input;
-        } else {
-            println!("Nombre inválido. Por favor, intenta de nuevo.");
+
+        // Enviar el nombre del cliente al servidor
+        stream.write_all(input.as_bytes())?;
+
+        // Esperar la respuesta del servidor
+        let mut buffer = [0; 512];
+        match stream.read(&mut buffer) {
+            Ok(n) => {
+                let response = String::from_utf8_lossy(&buffer[..n]);
+                if response.contains("Nombre en uso") {
+                    println!("{}", response); // Mostrar mensaje de error y solicitar un nuevo nombre
+                } else {
+                    println!("Nombre aceptado por el servidor.");
+                    break input; // Nombre aceptado, salir del loop
+                }
+            }
+            Err(e) => {
+                eprintln!("Error al leer la respuesta del servidor: {}", e);
+                return Err(e); // Manejo de error si la conexión falla
+            }
         }
     };
 
-    // Enviar el nombre del cliente al servidor
-    stream.write_all(client_name.as_bytes())?;
-
+    // Bucle principal de envío de mensajes
     loop {
         let mut input = String::new();
         println!("Escribe un mensaje: ");
@@ -76,7 +91,7 @@ fn main() -> io::Result<()> {
         io::stdin().read_line(&mut input).unwrap();
 
         let client_message = ClientMessage {
-            id: client_id.to_string(),  // Incluir el ID del cliente en el mensaje
+            id: client_id.to_string(), // Incluir el ID del cliente en el mensaje
             name: client_name.clone(),
             message: input.trim().to_string(),
         };
