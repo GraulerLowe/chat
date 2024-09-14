@@ -2,7 +2,9 @@
 
 ## Descripcion
 
-Este proyecto consiste en un sistema de Chat completo: servidor y cliente.
+Este proyecto consiste en un sistema de Chat completo: servidor y cliente. Todo se encuentra en la rama Servidor.
+
+Gael Arturo Leon Garcia
 
 ## Protocolo para el chat
 
